@@ -1,3 +1,5 @@
+Работа выполнена студентом МАИ группы М8О-205СВ-25 Рудневым Виктором Владимировичем.
+
 # BigDataFlink
 Анализ больших данных - лабораторная работа №3 - Streaming processing с помощью Flink
 
@@ -35,3 +37,16 @@
 2. Файл docker-compose.yml с установкой PostgreSQL, Flink, Kafka и запуском приложения, которое из файлов mock_data(*).csv создает сообщения json в Kafka.
 3. Инструкция, как запускать Flink-джобу и приложение для отправки данных в Kafka для проверки лабораторной работы.
 4. Код Apache Flink для трансформации данных в режиме streaming.
+
+## Запуск
+
+Скопировать `.env_example` в `.env` (разбор переменных в `REPORT.md`), затем из каталога `BigDataFlink`:
+
+```bash
+docker compose up -d --build
+docker exec bdfink-jobmanager flink run -d /opt/job/star-stream.jar
+```
+
+`docker compose up` поднимает Postgres, Kafka, Flink и один раз отправляет строки CSV как JSON в топик `mock_sales`. Вторая команда запускает streaming-джобу: она читает топик и пишет схему `star`. Джоба не завершается сама, после разбора сообщений ждёт новые.
+
+Повторно отправить CSV в Kafka: `docker compose up -d --force-recreate producer`. Повтор строки не создаёт второй факт: в `fact_sales` уникальны `source_file` и `source_row`.
